@@ -39,21 +39,6 @@ npm run dev
 npm run build
 ```
 
-## 项目结构
-
-```
-.
-├── app/
-│   └── uuavatar/
-│       └── page.tsx    # 主页面组件
-├── public/             # 静态资源
-└── package.json        # 项目配置
-```
-
-## 贡献
-
-欢迎提交 Issue 和 Pull Request！
-
 ## 许可证
 
 MIT

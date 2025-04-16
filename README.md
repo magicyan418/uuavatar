@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# UU Avatar Generator
 
-## Getting Started
+一个基于 Next.js 和 Multiavatar 的头像生成器，可以根据名字生成独特的头像。
 
-First, run the development server:
+## 功能特点
+
+- 🎨 根据输入的名字生成独特的头像
+- 🔄 支持随机名字生成
+- 📥 支持下载高清 PNG 格式头像
+- 🖼️ 高分辨率输出（10倍原始分辨率）
+- 🎯 简洁美观的用户界面
+- ⚡ 实时预览
+
+## 技术栈
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Multiavatar
+
+## 使用方法
+
+1. 在输入框中输入任意名字
+2. 头像会实时更新
+3. 点击"随机名字"按钮可以获取随机名字
+4. 点击"下载头像"按钮可以下载高清 PNG 格式的头像
+
+## 开发
 
 ```bash
+# 安装依赖
+npm install
+
+# 启动开发服务器
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# 构建生产版本
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 项目结构
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+.
+├── app/
+│   └── uuavatar/
+│       └── page.tsx    # 主页面组件
+├── public/             # 静态资源
+└── package.json        # 项目配置
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 贡献
 
-## Learn More
+欢迎提交 Issue 和 Pull Request！
 
-To learn more about Next.js, take a look at the following resources:
+## 许可证
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT

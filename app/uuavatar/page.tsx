@@ -57,40 +57,43 @@ const Uuavatar = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex flex-col items-center justify-center p-8">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-2xl">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">UU Avatar Generator</h1>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 flex flex-col items-center justify-center p-4 sm:p-8 animate-gradient">
+      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 w-full max-w-2xl border border-gray-200 dark:border-gray-700">
+        <h1 className="text-4xl font-bold text-center gradient-text mb-8">UU Avatar Generator</h1>
         
-        <div className="flex flex-col items-center gap-6">
-          <div className="w-full max-w-md">
+        <div className="flex flex-col items-center gap-8">
+          <div className="w-full max-w-md relative">
             <input
               type="text"
               value={name}
               onChange={handleNameChange}
-              className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all overflow-hidden whitespace-nowrap"
+              className="w-full px-6 py-4 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white/50 dark:bg-gray-700/50 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-800 outline-none transition-all text-lg"
               placeholder="输入名字生成头像"
             />
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 flex-wrap justify-center">
             <button
               onClick={handleRandom}
-              className="cursor-pointer px-6 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg hover:from-purple-600 hover:to-blue-600 transform hover:scale-105 transition-all shadow-md"
+              className="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-medium rounded-xl transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-indigo-500/25"
             >
               随机名字
             </button>
             <button
               onClick={handleDownload}
-              className="cursor-pointer px-6 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg hover:from-green-600 hover:to-teal-600 transform hover:scale-105 transition-all shadow-md"
+              className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium rounded-xl transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-pink-500/25"
             >
               下载头像
             </button>
           </div>
 
-          <div
-            dangerouslySetInnerHTML={{ __html: svgCode }}
-            className="w-64 h-64 p-4 bg-white rounded-full shadow-lg border-2 border-gray-100"
-          />
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full blur opacity-50 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+            <div
+              dangerouslySetInnerHTML={{ __html: svgCode }}
+              className="relative w-64 h-64 p-4 bg-white dark:bg-gray-800 rounded-full shadow-xl transform transition-transform duration-300 hover:scale-105"
+            />
+          </div>
         </div>
       </div>
     </div>

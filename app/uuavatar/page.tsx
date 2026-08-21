@@ -1,102 +1,217 @@
 "use client";
 
 import multiavatar from "@multiavatar/multiavatar/esm";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 
 const Uuavatar = () => {
   const [name, setName] = useState("magicyan");
-  const svgCode = useMemo(() => multiavatar(name), [name]);
+  const [isRandomizing, setIsRandomizing] = useState(false);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const previewName = name.trim() || "magicyan";
+  const svgCode = useMemo(() => multiavatar(previewName), [previewName]);
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value);
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setName(event.target.value.slice(0, 32));
+    setError("");
+    setNotice("");
   };
 
   const handleRandom = async () => {
+    setIsRandomizing(true);
+    setError("");
+    setNotice("");
+
     try {
-      const response = await fetch("https://api.oick.cn/api/uname");
-      const randomName = await response.json();
-      setName(randomName);
-    } catch (error) {
-      console.error('获取随机名字失败:', error);
+      const response = await fetch("/api/random-name", { cache: "no-store" });
+      const payload = await response.json();
+
+      if (!response.ok || typeof payload.name !== "string") {
+        throw new Error(payload.message || "随机名字生成失败");
+      }
+
+      setName(payload.name.slice(0, 32));
+      if (payload.fallback) {
+        setNotice("随机名字接口暂时不可用，先用一个本地名字吧");
+      }
+    } catch (requestError) {
+      console.error("获取随机名字失败:", requestError);
+      setError("暂时拿不到随机名字，再试一次吧");
+    } finally {
+      setIsRandomizing(false);
     }
   };
 
   const handleDownload = () => {
-    const svgBlob = new Blob([svgCode], { type: 'image/svg+xml' });
+    const svgBlob = new Blob([svgCode], { type: "image/svg+xml" });
     const svgUrl = URL.createObjectURL(svgBlob);
-    
     const img = new Image();
+
     img.onload = () => {
-      const scale = 10; // 提高分辨率倍数
-      const canvas = document.createElement('canvas');
-      // 设置 canvas 的实际尺寸（用于绘制）
+      const scale = 10;
+      const canvas = document.createElement("canvas");
       canvas.width = img.width * scale;
       canvas.height = img.height * scale;
-      // 设置 canvas 的显示尺寸（保持原始大小）
-      canvas.style.width = `${img.width}px`;
-      canvas.style.height = `${img.height}px`;
-      
-      const ctx = canvas.getContext('2d');
-      // 设置高质量渲染
-      ctx?.clearRect(0, 0, canvas.width, canvas.height);
-      // 先缩放画布
-      ctx?.scale(scale, scale);
-      // 然后绘制图像
-      ctx?.drawImage(img, 0, 0, img.width, img.height);
-      
-      const pngUrl = canvas.toDataURL('image/png', 1.0); // 使用最高质量
-      const link = document.createElement('a');
+
+      const context = canvas.getContext("2d");
+      context?.scale(scale, scale);
+      context?.drawImage(img, 0, 0, img.width, img.height);
+
+      const pngUrl = canvas.toDataURL("image/png", 1);
+      const link = document.createElement("a");
+      const safeName = previewName.replace(/[\\/:*?"<>|]/g, "").trim();
       link.href = pngUrl;
-      link.download = `${name || 'avatar'}.png`;
+      link.download = `${safeName || "avatar"}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(svgUrl);
     };
+
+    img.onerror = () => URL.revokeObjectURL(svgUrl);
     img.src = svgUrl;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 flex flex-col items-center justify-center p-4 sm:p-8 animate-gradient">
-      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 w-full max-w-2xl border border-gray-200 dark:border-gray-700">
-        <h1 className="text-4xl font-bold text-center gradient-text mb-8">UU Avatar Generator</h1>
-        
-        <div className="flex flex-col items-center gap-8">
-          <div className="w-full max-w-md relative">
-            <input
-              type="text"
-              value={name}
-              onChange={handleNameChange}
-              className="w-full px-6 py-4 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white/50 dark:bg-gray-700/50 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-800 outline-none transition-all text-lg"
-              placeholder="输入名字生成头像"
-            />
+    <main className="app-shell">
+      <div className="ambient-shape ambient-shape--top" aria-hidden="true" />
+      <div className="ambient-shape ambient-shape--bottom" aria-hidden="true" />
+
+      <section className="studio-card">
+        <header className="topbar">
+          <div className="brand">
+            <span className="brand-mark" aria-hidden="true">
+              U
+            </span>
+            <span className="brand-name">
+              UU AVATAR <small>STUDIO</small>
+            </span>
+          </div>
+          <div className="topbar-note">
+            <span className="status-dot" aria-hidden="true" />
+            简单、好玩、随时生成
+          </div>
+        </header>
+
+        <div className="studio-grid">
+          <section className="intro-copy">
+            <p className="eyebrow">个性化头像工作室</p>
+            <h1>
+              让名字，
+              <br />
+              <span>长成一个头像。</span>
+            </h1>
+            <p className="intro-description">
+              输入一个名字，马上生成一个独一无二的 UU Avatar。换个名字，
+              角色也会跟着变。
+            </p>
+
+            <div className="mini-illustration" aria-hidden="true">
+              <span className="doodle-sun" />
+              <span className="doodle-cloud doodle-cloud--one" />
+              <span className="doodle-cloud doodle-cloud--two" />
+              <span className="doodle-star doodle-star--one">✦</span>
+              <span className="doodle-star doodle-star--two">✦</span>
+              <span className="doodle-line" />
+            </div>
+          </section>
+
+          <section className="generator-panel" aria-label="头像生成器">
+            <div className="panel-heading">
+              <div>
+                <p className="field-label">你的名字</p>
+                <p className="field-help">名字会即时生成专属形象</p>
+              </div>
+              <span className="live-pill">LIVE</span>
+            </div>
+
+            <label className="input-wrap">
+              <span className="input-icon" aria-hidden="true">
+                ✦
+              </span>
+              <input
+                type="text"
+                value={name}
+                onChange={handleNameChange}
+                placeholder="输入名字生成头像"
+                aria-label="输入名字生成头像"
+              />
+              <span className="input-count" aria-hidden="true">
+                {name.length}/32
+              </span>
+            </label>
+
+            {error && (
+              <p className="error-message" role="alert">
+                {error}
+              </p>
+            )}
+            {notice && <p className="notice-message">{notice}</p>}
+
+            <div className="action-row">
+              <button
+                type="button"
+                onClick={handleRandom}
+                disabled={isRandomizing}
+                className="button button--secondary"
+              >
+                <span aria-hidden="true">{isRandomizing ? "…" : "✣"}</span>
+                {isRandomizing ? "正在想一个" : "随机名字"}
+              </button>
+              <button
+                type="button"
+                onClick={handleDownload}
+                className="button button--primary"
+              >
+                <span aria-hidden="true">↓</span>
+                下载头像
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <section className="preview-section" aria-label="头像预览">
+          <div className="preview-info">
+            <p className="preview-kicker">AVATAR PREVIEW</p>
+            <h2>这就是你的新头像</h2>
+            <p>
+              每个名字都有自己的样子。试着输入一个昵称，看看它会变成什么。
+            </p>
+            <div className="preview-tip">
+              <span aria-hidden="true">↗</span>
+              输入时实时更新
+            </div>
           </div>
 
-          <div className="flex gap-4 flex-wrap justify-center">
-            <button
-              onClick={handleRandom}
-              className="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-medium rounded-xl transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-indigo-500/25"
-            >
-              随机名字
-            </button>
-            <button
-              onClick={handleDownload}
-              className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium rounded-xl transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-pink-500/25"
-            >
-              下载头像
-            </button>
-          </div>
-
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full blur opacity-50 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+          <div className="avatar-stage">
+            <span className="stage-scribble stage-scribble--left" aria-hidden="true">
+              ✦
+            </span>
+            <span className="stage-scribble stage-scribble--right" aria-hidden="true">
+              ○
+            </span>
+            <span className="stage-leaf stage-leaf--one" aria-hidden="true" />
+            <span className="stage-leaf stage-leaf--two" aria-hidden="true" />
             <div
               dangerouslySetInnerHTML={{ __html: svgCode }}
-              className="relative w-64 h-64 p-4 bg-white dark:bg-gray-800 rounded-full shadow-xl transform transition-transform duration-300 hover:scale-105"
+              className="avatar-frame"
             />
+            <div className="avatar-caption">
+              <span className="caption-dot" aria-hidden="true" />
+              <strong>{previewName}</strong>
+              <span>UU avatar</span>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </section>
+
+        <footer className="studio-footer">
+          <span>由名字开始，做一个有趣的自己。</span>
+          <span className="footer-decoration" aria-hidden="true">
+            ✿
+          </span>
+        </footer>
+      </section>
+    </main>
   );
 };
 
